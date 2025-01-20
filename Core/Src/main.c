@@ -17,7 +17,7 @@
   */
 /*
 	* That code was started to be written on 7.12.24 at 17.57 by Nevfel. 
-	* Hope it will lead me to wiser and more peaceful version of mine.
+	* Hope it will lead me to wiser version of mine.
 	*/
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
