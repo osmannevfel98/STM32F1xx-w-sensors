@@ -40,7 +40,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+uint8_t data = 1;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -332,7 +332,19 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    if (GPIO_Pin == GPIO_PIN_1) {
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET); // Buzzer ON
+        HAL_Delay(500);                                 
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); // Buzzer OFF
+			
+        HAL_USART_Transmit(&husart1, &data, 1, HAL_MAX_DELAY); // 1 byte send to ESP32
+			/*	
+				if (HAL_USART_Transmit(&husart1, &data, 1, HAL_MAX_DELAY) != HAL_OK) {
+            Error_Handler(); // if data could not be sent, call that func. will be impelemented.
+			*/
+    }
+}
 /* USER CODE END 4 */
 
 /**
