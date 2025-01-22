@@ -35,12 +35,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define GAS_THRESHOLD 2000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-uint8_t data = 1;
+uint8_t PIR_data = 1; // PIR sensor is activated
+uint8_t MQ2_data = 2; // MQ2 sensor is activated
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -338,13 +339,41 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         HAL_Delay(500);                                 
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); // Buzzer OFF
 			
-        HAL_USART_Transmit(&husart1, &data, 1, HAL_MAX_DELAY); // 1 byte send to ESP32
+        HAL_USART_Transmit(&husart1, &PIR_data, 1, HAL_MAX_DELAY); // PIR_data value send to ESP32
 			/*	
-				if (HAL_USART_Transmit(&husart1, &data, 1, HAL_MAX_DELAY) != HAL_OK) {
+				if (HAL_USART_Transmit(&husart1, &PIR_data, 1, HAL_MAX_DELAY) != HAL_OK) {
             Error_Handler(); // if data could not be sent, call that func. will be impelemented.
 			*/
     }
 }
+
+
+void MQ2_Read(void) {
+    uint32_t adc_value;
+
+    HAL_ADC_Start(&hadc1);
+	
+    if (HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY) == HAL_OK) {
+        adc_value = HAL_ADC_GetValue(&hadc1);
+    }
+		
+    HAL_ADC_Stop(&hadc1);
+
+    if (adc_value > GAS_THRESHOLD) {
+       
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET); // Buzzer ON
+				HAL_USART_Transmit(&husart1, &MQ2_data, 1, HAL_MAX_DELAY); // MQ2_data value send to ESP32
+    } else {
+      
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); // Buzzer OFF
+    }
+		/*	
+				if (HAL_USART_Transmit(&husart1, &MQ2_data, 1, HAL_MAX_DELAY) != HAL_OK) {
+            Error_Handler(); // if data could not be sent, call that func. will be impelemented.
+			*/
+
+}
+
 /* USER CODE END 4 */
 
 /**
