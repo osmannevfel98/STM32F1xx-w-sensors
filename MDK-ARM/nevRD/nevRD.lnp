@@ -1,0 +1,25 @@
+--cpu Cortex-M3
+"nevrd\startup_stm32f100xb.o"
+"nevrd\main.o"
+"nevrd\stm32f1xx_it.o"
+"nevrd\stm32f1xx_hal_msp.o"
+"nevrd\stm32f1xx_hal_gpio_ex.o"
+"nevrd\stm32f1xx_hal_adc.o"
+"nevrd\stm32f1xx_hal_adc_ex.o"
+"nevrd\stm32f1xx_hal.o"
+"nevrd\stm32f1xx_hal_rcc.o"
+"nevrd\stm32f1xx_hal_rcc_ex.o"
+"nevrd\stm32f1xx_hal_gpio.o"
+"nevrd\stm32f1xx_hal_dma.o"
+"nevrd\stm32f1xx_hal_cortex.o"
+"nevrd\stm32f1xx_hal_pwr.o"
+"nevrd\stm32f1xx_hal_flash.o"
+"nevrd\stm32f1xx_hal_flash_ex.o"
+"nevrd\stm32f1xx_hal_exti.o"
+"nevrd\stm32f1xx_hal_i2c.o"
+"nevrd\stm32f1xx_hal_usart.o"
+"nevrd\system_stm32f1xx.o"
+--strict --scatter "nevRD\nevRD.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "nevRD.map" -o nevRD\nevRD.axf
