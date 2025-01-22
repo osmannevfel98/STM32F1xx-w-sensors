@@ -61,6 +61,7 @@ static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART1_Init(void);
+void MQ2_Read(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -110,6 +111,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    MQ2_Read();  // Check gas level
+    
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -345,6 +350,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
             Error_Handler(); // if data could not be sent, call that func. will be impelemented.
 			*/
     }
+		HAL_Delay(100);
 }
 
 
