@@ -59,6 +59,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define PIR_EXTI1_Pin GPIO_PIN_1
 #define PIR_EXTI1_GPIO_Port GPIOA
+#define PIR_EXTI1_EXTI_IRQn EXTI1_IRQn
 #define Buzzer_Pin GPIO_PIN_3
 #define Buzzer_GPIO_Port GPIOA
 #define System_Control_Pin GPIO_PIN_0
