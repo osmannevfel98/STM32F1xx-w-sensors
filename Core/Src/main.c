@@ -17,7 +17,6 @@
   */
 /*
 	* That code was started to be written on 7.12.24 at 17.57 by Nevfel. 
-	* Hope it will lead me to wiser version of mine.
 	*/
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -42,6 +41,8 @@
 /* USER CODE BEGIN PM */
 uint8_t PIR_data = 1; // PIR sensor is activated
 uint8_t MQ2_data = 2; // MQ2 sensor is activated
+volatile uint8_t error_code = 0;
+volatile uint16_t error_led_pin;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -345,10 +346,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); // Buzzer OFF
 			
         HAL_USART_Transmit(&husart1, &PIR_data, 1, HAL_MAX_DELAY); // PIR_data value send to ESP32
-			/*	
+				
 				if (HAL_USART_Transmit(&husart1, &PIR_data, 1, HAL_MAX_DELAY) != HAL_OK) {
-            Error_Handler(); // if data could not be sent, call that func. will be impelemented.
-			*/
+						error_code = 2; // 2 is PIR data error code
+            Error_Handler(); // if data could not be sent, call that func. 
+				}
     }
 		HAL_Delay(100);
 }
@@ -373,10 +375,11 @@ void MQ2_Read(void) {
       
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); // Buzzer OFF
     }
-		/*	
+			
 				if (HAL_USART_Transmit(&husart1, &MQ2_data, 1, HAL_MAX_DELAY) != HAL_OK) {
-            Error_Handler(); // if data could not be sent, call that func. will be impelemented.
-			*/
+						error_code = 3;  // 3 is MQ2 data error code
+            Error_Handler(); // if data could not be sent, call that func. 
+				}
 
 }
 
@@ -390,10 +393,21 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	
+  __disable_irq(); //disables all interrupts. This ensures that the system 
+									 //is not interfered with by another interrupt during the error.
+	if (error_code == 2) {
+        error_led_pin = GPIO_PIN_9; // PIR error
+    } else if (error_code == 3) {
+        error_led_pin = GPIO_PIN_8; // MQ2 error
+    } 
+		// ADD ELSE HERE
+		while (1)
+    {
+        HAL_GPIO_TogglePin(GPIOC, error_led_pin);
+        HAL_Delay(200);
+    }
+	
   /* USER CODE END Error_Handler_Debug */
 }
 
