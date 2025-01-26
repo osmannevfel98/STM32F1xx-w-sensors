@@ -29,6 +29,10 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+typedef struct {
+    GPIO_TypeDef *port;
+    uint16_t pin;
+} ErrorInfo;
 
 /* USER CODE END PTD */
 
@@ -62,9 +66,9 @@ static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART1_Init(void);
-void MQ2_Read(void);
 /* USER CODE BEGIN PFP */
-
+void MQ2_Read(void);
+void Transmit_Data(uint8_t *data, uint16_t size);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -302,7 +306,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(Buzzer_GPIO_Port, Buzzer_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LD4_Pin|LD3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LD5_Pin|LD4_Pin|LD3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PIR_EXTI1_Pin */
   GPIO_InitStruct.Pin = PIR_EXTI1_Pin;
@@ -323,8 +327,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(System_Control_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LD4_Pin LD3_Pin */
-  GPIO_InitStruct.Pin = LD4_Pin|LD3_Pin;
+  /*Configure GPIO pins : LD5_Pin LD4_Pin LD3_Pin */
+  GPIO_InitStruct.Pin = LD5_Pin|LD4_Pin|LD3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -347,10 +351,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 			
         HAL_USART_Transmit(&husart1, &PIR_data, 1, HAL_MAX_DELAY); // PIR_data value send to ESP32
 				
-				if (HAL_USART_Transmit(&husart1, &PIR_data, 1, HAL_MAX_DELAY) != HAL_OK) {
-						error_code = 2; // 2 is PIR data error code
-            Error_Handler(); // if data could not be sent, call that func. 
-				}
+				Transmit_Data(&PIR_data, 1);
     }
 		HAL_Delay(100);
 }
@@ -376,12 +377,17 @@ void MQ2_Read(void) {
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); // Buzzer OFF
     }
 			
-				if (HAL_USART_Transmit(&husart1, &MQ2_data, 1, HAL_MAX_DELAY) != HAL_OK) {
-						error_code = 3;  // 3 is MQ2 data error code
-            Error_Handler(); // if data could not be sent, call that func. 
-				}
+		Transmit_Data(&MQ2_data, 1);
 
 }
+
+void Transmit_Data(uint8_t *data, uint16_t size) {
+    if (HAL_USART_Transmit(&husart1, data, size, HAL_MAX_DELAY) != HAL_OK) {
+        error_code = (*data == PIR_data) ? 2 : 3;
+        Error_Handler();
+    }
+}
+
 
 /* USER CODE END 4 */
 
@@ -396,17 +402,24 @@ void Error_Handler(void)
 	
   __disable_irq(); //disables all interrupts. This ensures that the system 
 									 //is not interfered with by another interrupt during the error.
+	ErrorInfo error_info;
+
 	if (error_code == 2) {
-        error_led_pin = GPIO_PIN_9; // PIR error
-    } else if (error_code == 3) {
-        error_led_pin = GPIO_PIN_8; // MQ2 error
-    } 
-		// ADD ELSE HERE
-		while (1)
-    {
-        HAL_GPIO_TogglePin(GPIOC, error_led_pin);
-        HAL_Delay(200);
-    }
+			error_info.port = GPIOC;
+			error_info.pin = GPIO_PIN_9; // PIR error
+	} else if (error_code == 3) {
+			error_info.port = GPIOC;
+			error_info.pin = GPIO_PIN_8; // MQ2 error
+	} else {
+			error_info.port = GPIOC;
+			error_info.pin = GPIO_PIN_7; // Default error
+	}
+
+	while (1) {
+			HAL_GPIO_TogglePin(error_info.port, error_info.pin);
+			HAL_Delay(200);
+	}
+
 	
   /* USER CODE END Error_Handler_Debug */
 }

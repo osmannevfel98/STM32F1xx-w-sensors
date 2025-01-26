@@ -64,6 +64,8 @@ void Error_Handler(void);
 #define Buzzer_GPIO_Port GPIOA
 #define System_Control_Pin GPIO_PIN_0
 #define System_Control_GPIO_Port GPIOB
+#define LD5_Pin GPIO_PIN_7
+#define LD5_GPIO_Port GPIOC
 #define LD4_Pin GPIO_PIN_8
 #define LD4_GPIO_Port GPIOC
 #define LD3_Pin GPIO_PIN_9
