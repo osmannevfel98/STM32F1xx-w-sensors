@@ -119,7 +119,6 @@ int main(void)
     MQ2_Read();  // Check gas level
     
 
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
