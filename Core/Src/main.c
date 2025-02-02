@@ -38,7 +38,7 @@ typedef struct {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define gas_threshold 2000
+#define GAS_THRESHOLD 2000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -367,7 +367,7 @@ void MQ2_Read(void) {
 		
     HAL_ADC_Stop(&hadc1);
 
-    if (adc_value > gas_threshold) {
+    if (adc_value > GAS_THRESHOLD) {
        
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET); // Buzzer ON
 				HAL_USART_Transmit(&husart1, &mq2_data, 1, HAL_MAX_DELAY); // mq2_data value send to ESP32
