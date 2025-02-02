@@ -38,13 +38,13 @@ typedef struct {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define GAS_THRESHOLD 2000
+#define gas_threshold 2000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-uint8_t PIR_data = 1; // PIR sensor is activated
-uint8_t MQ2_data = 2; // MQ2 sensor is activated
+uint8_t pir_data = 1; // PIR sensor is activated
+uint8_t mq2_data = 2; // MQ2 sensor is activated
 volatile uint8_t error_code = 0;
 volatile uint16_t error_led_pin;
 /* USER CODE END PM */
@@ -348,9 +348,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
         HAL_Delay(500);                                 
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); // Buzzer OFF
 			
-        HAL_USART_Transmit(&husart1, &PIR_data, 1, HAL_MAX_DELAY); // PIR_data value send to ESP32
+        HAL_USART_Transmit(&husart1, &pir_data, 1, HAL_MAX_DELAY); // pir_data value send to ESP32
 				
-				Transmit_Data(&PIR_data, 1);
+				Transmit_Data(&pir_data, 1);
     }
 		HAL_Delay(100);
 }
@@ -367,22 +367,22 @@ void MQ2_Read(void) {
 		
     HAL_ADC_Stop(&hadc1);
 
-    if (adc_value > GAS_THRESHOLD) {
+    if (adc_value > gas_threshold) {
        
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET); // Buzzer ON
-				HAL_USART_Transmit(&husart1, &MQ2_data, 1, HAL_MAX_DELAY); // MQ2_data value send to ESP32
+				HAL_USART_Transmit(&husart1, &mq2_data, 1, HAL_MAX_DELAY); // mq2_data value send to ESP32
     } else {
       
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET); // Buzzer OFF
     }
 			
-		Transmit_Data(&MQ2_data, 1);
+		Transmit_Data(&mq2_data, 1);
 
 }
 
 void Transmit_Data(uint8_t *data, uint16_t size) {
     if (HAL_USART_Transmit(&husart1, data, size, HAL_MAX_DELAY) != HAL_OK) {
-        error_code = (*data == PIR_data) ? 2 : 3;
+        error_code = (*data == pir_data) ? 2 : 3;
         Error_Handler();
     }
 }
